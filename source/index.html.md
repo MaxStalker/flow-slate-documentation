@@ -1,241 +1,57 @@
----
-title: API Reference
+## Introduction
+The Cadence Programming Language is a new high-level programming language intended for smart contract development.
 
-language_tabs: # must be one of https://git.io/vQNgJ
-  - shell
-  - ruby
-  - python
-  - javascript
+The language's goals are, in order of importance:
 
-toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
-  - <a href='https://github.com/slatedocs/slate'>Documentation Powered by Slate</a>
+- **Safety and security**: Provide a strong static type system, design by contract (preconditions and postconditions), and resources (inspired by linear types).
 
-includes:
-  - errors
+- **Auditability**: Focus on readability: Make it easy to verify what the code is doing, and make intentions explicit, at a small cost of verbosity.
 
-search: true
+- **Simplicity**: Focus on developer productivity and usability: Make it easy to write code, provide good tooling.
 
-code_clipboard: true
----
+## Terminology
+In this document, the following terminology is used to describe syntax or behavior that is not allowed in the language:
 
-# Introduction
+- `Invalid means` that the invalid program will not even be allowed to run. The program error is detected and reported statically by the type checker.
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+- `Run-time error` means that the erroneous program will run, but bad behavior will result in the execution of the program being aborted.
 
-We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
 
-This example API documentation page was created with [Slate](https://github.com/slatedocs/slate). Feel free to edit it and use it as a base for your own API's documentation.
+## Syntax and Behavior
 
-# Authentication
+Much of the language's syntax is inspired by Swift, Kotlin, and TypeScript.
 
-> To authorize, use this code:
+Much of the syntax, types, and standard library is inspired by Swift,
+which popularized e.g. optionals, argument labels,
+and provides safe handling of integers and strings.
 
-```ruby
-require 'kittn'
+Resources are based on liner types which were popularized by Rust.
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
+Events are inspired by Solidity.
+
+**Disclaimer:** In real Cadence code, all type definitions and code
+must be declared and contained in [contracts](#contracts) or [transactions](#transactions),
+but we omit these containers in examples for simplicity.
+
+## Comments
+
+Comments can be used to document code.
+A comment is text that is not executed.
+
+*Single-line comments* start with two slashes (`//`).
+These comments can go on a line by themselves or they can go directly after a line of code.
+
+```cadence,file=single-line-comment.cdc
+// This is a comment on a single line.
+// Another comment line that is not executed.
+
+let x = 1  // Here is another comment after a line of code.
 ```
 
-```python
-import kittn
+*Multi-line comments* start with a slash and an asterisk (`/*`)
+and end with an asterisk and a slash (`*/`):
 
-api = kittn.authorize('meowmeowmeow')
+```cadence,file=multi-line-comment.cdc
+/* This is a comment which
+spans multiple lines. */
 ```
-
-```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-```
-
-> Make sure to replace `meowmeowmeow` with your API key.
-
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
-
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
-
-`Authorization: meowmeowmeow`
-
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-
-# Kittens
-
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
-
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
-```
-
-> The above command returns JSON structured like this:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
-]
-```
-
-This endpoint retrieves all kittens.
-
-### HTTP Request
-
-`GET http://example.com/api/kittens`
-
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
-
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
-```
-
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
-
-### HTTP Request
-
-`GET http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
-
-## Delete a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2"
-  -X DELETE
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "deleted" : ":("
-}
-```
-
-This endpoint deletes a specific kitten.
-
-### HTTP Request
-
-`DELETE http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to delete
-
